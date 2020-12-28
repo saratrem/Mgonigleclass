@@ -60,6 +60,17 @@ plot(x=lions$black, y=lions$age, xlab='Amount of black in nose', ylab='Age', pch
 ```
 ```{r}
 #effects of light treatment on circadian rhythms
+#1
+knee <- read_csv('knees.csv')
+#2
+head(knee)
+
+#3
+summary(knee)
+
+#treatment variable is a character 
+knee$treatment <- as.factor(knee$treatment)
+class(knee$treatment)
 
 ```
 
