@@ -148,4 +148,182 @@ plot(x=lions$black, y=lions$age, xlab='Amount of black in nose', ylab='Age', pch
 
 ``` r
 #effects of light treatment on circadian rhythms
+#1
+knee <- read_csv('knees.csv')
+```
+
+    ## 
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## cols(
+    ##   treatment = col_character(),
+    ##   shift = col_double()
+    ## )
+
+``` r
+#2
+head(knee)
+```
+
+    ## # A tibble: 6 x 2
+    ##   treatment shift
+    ##   <chr>     <dbl>
+    ## 1 control    0.2 
+    ## 2 control    0.53
+    ## 3 control   -0.68
+    ## 4 control   -0.37
+    ## 5 control   -0.64
+    ## 6 control    0.36
+
+``` r
+#3
+summary(knee)
+```
+
+    ##   treatment             shift        
+    ##  Length:22          Min.   :-2.8300  
+    ##  Class :character   1st Qu.:-1.3300  
+    ##  Mode  :character   Median :-0.6600  
+    ##                     Mean   :-0.7127  
+    ##                     3rd Qu.:-0.0500  
+    ##                     Max.   : 0.7300
+
+``` r
+#treatment variable is a character 
+knee$treatment <- as.factor(knee$treatment)
+class(knee$treatment)
+```
+
+    ## [1] "factor"
+
+``` r
+#5
+knee$treatment <- knee$treatment %>% fct_relevel("control", "knee", "eyes")
+knee$treatment %>% head()
+```
+
+    ## [1] control control control control control control
+    ## Levels: control knee eyes
+
+``` r
+#6
+c <- ggplot( data = knee, aes( x = treatment, y = shift)) + geom_point(aes(color = treatment))
+c
+```
+
+![](linear_model_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+
+``` r
+#fit a linear model 
+
+#1
+circa <- lm(shift ~ treatment, data = knee)
+summ_circa <- summary(circa)
+
+#2
+visreg(circa, xvar= 'treatment')
+```
+
+![](linear_model_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+
+``` r
+#4
+model.matrix(circa)
+```
+
+    ##    (Intercept) treatmentknee treatmenteyes
+    ## 1            1             0             0
+    ## 2            1             0             0
+    ## 3            1             0             0
+    ## 4            1             0             0
+    ## 5            1             0             0
+    ## 6            1             0             0
+    ## 7            1             0             0
+    ## 8            1             0             0
+    ## 9            1             1             0
+    ## 10           1             1             0
+    ## 11           1             1             0
+    ## 12           1             1             0
+    ## 13           1             1             0
+    ## 14           1             1             0
+    ## 15           1             1             0
+    ## 16           1             0             1
+    ## 17           1             0             1
+    ## 18           1             0             1
+    ## 19           1             0             1
+    ## 20           1             0             1
+    ## 21           1             0             1
+    ## 22           1             0             1
+    ## attr(,"assign")
+    ## [1] 0 1 1
+    ## attr(,"contrasts")
+    ## attr(,"contrasts")$treatment
+    ## [1] "contr.treatment"
+
+``` r
+#5
+summ_circa
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = shift ~ treatment, data = knee)
+    ## 
+    ## Residuals:
+    ##      Min       1Q   Median       3Q      Max 
+    ## -1.27857 -0.36125  0.03857  0.61147  1.06571 
+    ## 
+    ## Coefficients:
+    ##               Estimate Std. Error t value Pr(>|t|)   
+    ## (Intercept)   -0.30875    0.24888  -1.241  0.22988   
+    ## treatmentknee -0.02696    0.36433  -0.074  0.94178   
+    ## treatmenteyes -1.24268    0.36433  -3.411  0.00293 **
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 0.7039 on 19 degrees of freedom
+    ## Multiple R-squared:  0.4342, Adjusted R-squared:  0.3746 
+    ## F-statistic: 7.289 on 2 and 19 DF,  p-value: 0.004472
+
+``` r
+#6
+emmeans(circa, specs = 'treatment')
+```
+
+    ##  treatment emmean    SE df lower.CL upper.CL
+    ##  control   -0.309 0.249 19   -0.830    0.212
+    ##  knee      -0.336 0.266 19   -0.893    0.221
+    ##  eyes      -1.551 0.266 19   -2.108   -0.995
+    ## 
+    ## Confidence level used: 0.95
+
+``` r
+knee %>% group_by(treatment) %>% summarise(mean(shift))
+```
+
+    ## `summarise()` ungrouping output (override with `.groups` argument)
+
+    ## # A tibble: 3 x 2
+    ##   treatment `mean(shift)`
+    ##   <fct>             <dbl>
+    ## 1 control          -0.309
+    ## 2 knee             -0.336
+    ## 3 eyes             -1.55
+
+``` r
+#7
+drop1(circa, test = 'F')
+```
+
+    ## Single term deletions
+    ## 
+    ## Model:
+    ## shift ~ treatment
+    ##           Df Sum of Sq     RSS      AIC F value   Pr(>F)   
+    ## <none>                  9.4153 -12.6714                    
+    ## treatment  2    7.2245 16.6398  -4.1433  7.2894 0.004472 **
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+``` r
+#
 ```
