@@ -1,0 +1,5 @@
+"0","plot(x=dd$pred, y=dd$response, xlab='pred', ylab='response',
+     col='red', pch=16, las=1, curve(b0 + b1* x, from = min(dd$pred), to= max(dd$pred), col = 'blue', add = TRUE))
+"
+"2","Error in plot.xy(xy, type, ...) : invalid plot type
+"
