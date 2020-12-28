@@ -6,6 +6,8 @@ output: github_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
+library(visreg)
+library(emmeans)
 ```
 ```{r}
 #1
@@ -72,6 +74,37 @@ summary(knee)
 knee$treatment <- as.factor(knee$treatment)
 class(knee$treatment)
 
+#5
+knee$treatment <- knee$treatment %>% fct_relevel("control", "knee", "eyes")
+knee$treatment %>% head()
+
+#6
+c <- ggplot( data = knee, aes( x = treatment, y = shift)) + geom_point(aes(color = treatment))
+c
+
+```
+```{r}
+#fit a linear model 
+
+#1
+circa <- lm(shift ~ treatment, data = knee)
+summ_circa <- summary(circa)
+
+#2
+visreg(circa, xvar= 'treatment')
+
+#4
+model.matrix(circa)
+
+#5
+summ_circa
+
+#6
+emmeans(circa, specs = 'treatment')
+knee %>% group_by(treatment) %>% summarise(mean(shift))
+
+#7
+drop1(circa, test = 'F')
 ```
 
 
