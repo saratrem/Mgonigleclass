@@ -7,24 +7,37 @@ output: github_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library('lme4')
 ```
 
-## R Markdown
+```{r}
+flycatcher <- read.csv('flycatcher.csv')
+head(flycatcher) 
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+ggplot(data = flycatcher, aes( x = year, y = patch, group = year)) + geom_boxplot()
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+#1
+class(flycatcher$year)
+flycatcher$year <- as.factor(flycatcher$year)
+class(flycatcher$year)
 
-```{r cars}
-summary(cars)
+#indivudal birds as the random groups
+out <- lmer(patch ~ 1 + (1|bird), data = flycatcher)
+summ <- summary(out)
+summ
+
+outwith <- lmer(patch ~ 1 +(1|bird) + (1|year), data =flycatcher)
+outwith
+
+#4
+VarCorr(out)
+
+
+#6
+plot( x = fitted(out), y = resid(out), pch = 16)
+```
+```{r}
+read.csv(')
 ```
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
