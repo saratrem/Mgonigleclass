@@ -1,12 +1,12 @@
 ---
 title: "demo_linearmodel"
 author: "Sara"
-date: "28/12/2020"
 output: github_document
 ---
 
 ```{r}
 library(tidyverse)
+library(rmarkdown)
 ```
 
 

@@ -1,0 +1,107 @@
+---
+title: "mixed_effect"
+author: "Sara"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(lme4)
+library(visreg)
+```
+
+```{r}
+flycatcher <- read.csv('flycatcher.csv')
+head(flycatcher) 
+
+ggplot(data = flycatcher, aes( x = year, y = patch, group = year)) + geom_boxplot()
+
+#1
+class(flycatcher$year)
+flycatcher$year <- as.factor(flycatcher$year)
+class(flycatcher$year)
+
+#indivudal birds as the random groups
+out <- lmer(patch ~ 1 + (1|bird), data = flycatcher)
+summ <- summary(out)
+summ
+
+outwith <- lmer(patch ~ 1 +(1|bird) + (1|year), data =flycatcher)
+outwith
+
+#4
+VarCorr(out)
+
+
+#6
+plot( x = fitted(out), y = resid(out), pch = 16)
+```
+```{r}
+gold <- read.csv('goldfish.csv')
+head(gold)
+interaction.plot(response=gold$sensitivity,
+                 x.factor = gold$wavelength,
+                 trace.factor = gold$fish,
+                 legend = FALSE,
+                 lty = 1,
+                 xlab = 'Wavelength', ylab = 'Sensitivity', type = 'b', pch =16, las =1)
+
+#ggplot
+
+ggplot(data = gold, aes( x = wavelength, y = sensitivity, group = fish))+ geom_point() + geom_line() + theme_classic()
+
+#3 : subject by treatment, repeated measures design, since each fish is measured once under each treatment 
+
+
+#fit a linear mixed effect models
+#1
+out <- lmer(sensitivity ~ wavelength + (1|fish), data = gold)
+summ <- summary(out)
+summ
+
+#2
+visreg(out, xvar = 'wavelength')
+
+#3
+fitted(out) + resid(out)
+gold$sensitivity
+plot( x = gold$sensitivity, y = fitted(out) + resid(out))
+
+#4
+plot( y = resid(out), x = fitted(out)) + abline(a=0, b=0, lty=2, col='red')
+```
+
+```{r}
+#1
+kk <- read.csv('kluane.csv')
+
+#3 split -plot design, plots assign randomlytreatments
+
+#4
+ggplot(data = kk, aes( x = duration, y = phen.ach)) + facet_grid(cols = vars(treatment)) + geom_line(aes(group = plot, color = "black")) + geom_point(size = 3)
+
+#fit a linear mixed effect model 
+#1
+out <- lmer(log(phen.ach) ~ treatment + duration + (1|plot), data = kk) 
+summ <- summary (out)
+summ
+
+# visualize 
+#plot residuals 
+
+plot( x = fitted(out), y = resid(out)) + abline( h = 0, col = 'red')
+
+#qq-plot (check normlity)
+qqnorm(as.vector(resid(out)))
+
+#2
+out <- lmer(log(phen.ach) ~ treatment * duration + ( 1|plot), data = kk)
+summ <- summary(out)
+summ
+visreg(out, xvar ='duration', by = 'treatment')
+
+#3
+plot( y =resid(out), x = fitted(out))
+
+```
+
